@@ -240,6 +240,7 @@ resource "aws_cloudwatch_metric_alarm" "auto_stop_idle" {
 # ------------------------------------------------------------------------------
 # Proactively protects your promotional credits with automated email thresholds.
 resource "aws_budgets_budget" "monthly_workstation_budget" {
+  count             = var.enable_budget ? 1 : 0
   name              = "monthly-workstation-credit-budget"
   budget_type       = "COST"
   limit_amount      = tostring(var.monthly_budget_usd)
