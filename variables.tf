@@ -67,3 +67,9 @@ variable "monthly_budget_usd" {
   type        = number
   default     = 35.0
 }
+
+variable "enable_budget" {
+  description = "Controls whether to create an AWS Budget resource. Set to false if the IAM user lacks budgets:ModifyBudget permissions."
+  type        = bool
+  default     = false
+}
