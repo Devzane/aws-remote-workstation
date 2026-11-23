@@ -100,6 +100,24 @@ resource "aws_iam_role_policy" "stop_self" {
   })
 }
 
+# Grants access to regional Amazon S3 bucket for Amazon DCV EC2 license verification
+resource "aws_iam_role_policy" "dcv_license" {
+  name = "workstation-dcv-license"
+  role = aws_iam_role.workstation_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowDCVLicenseRead"
+        Effect   = "Allow"
+        Action   = "s3:GetObject"
+        Resource = "arn:aws:s3:::dcv-license.${var.aws_region}/*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_instance_profile" "workstation_profile" {
   name = "workstation-instance-profile"
   role = aws_iam_role.workstation_role.name
@@ -138,6 +156,15 @@ resource "aws_security_group" "workstation_sg" {
     description = "Secure Shell access"
     from_port   = 22
     to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.allowed_ip]
+  }
+
+  # Windows Remote Desktop / xrdp (TCP 3389)
+  ingress {
+    description = "Standard RDP fallback for Windows Remote Desktop Connection"
+    from_port   = 3389
+    to_port     = 3389
     protocol    = "tcp"
     cidr_blocks = [var.allowed_ip]
   }
