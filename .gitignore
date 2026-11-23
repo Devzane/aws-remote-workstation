@@ -1,0 +1,43 @@
+# Local .terraform directories
+**/.terraform/*
+.terraform/
+.terraform.lock.hcl.backup
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude sensitive tfvars files (use terraform.tfvars.example instead)
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# SSH and TLS private keys & certificates
+*.pem
+*.key
+*.id_rsa
+*.id_ed25519
+id_rsa*
+id_ed25519*
+*.cer
+*.crt
+*.pfx
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
