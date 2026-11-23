@@ -23,8 +23,13 @@ output "dcv_client_target" {
 }
 
 output "ssh_connection_string" {
-  description = "Direct SSH command to connect to the workstation"
+  description = "Direct SSH command to connect to the workstation desktop user"
   value       = "ssh -i <path-to-private-key> ${var.workstation_user}@${aws_instance.workstation.public_ip}"
+}
+
+output "ssh_admin_connection_string" {
+  description = "Direct SSH command to connect as default administrative user (ubuntu)"
+  value       = "ssh -i <path-to-private-key> ubuntu@${aws_instance.workstation.public_ip}"
 }
 
 output "ssm_shell_command" {
