@@ -68,7 +68,7 @@ ufw --force enable
 # Enforce SSH hardening: disable passwords & root login
 sed -i -E 's/^#?PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config
 sed -i -E 's/^#?PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
-systemctl restart sshd
+systemctl restart ssh || systemctl restart sshd || true
 
 # ------------------------------------------------------------------------------
 # 3. WORKSTATION USER PROVISIONING
@@ -115,16 +115,21 @@ chown -R "$WORKSTATION_USER:$WORKSTATION_USER" "/home/$WORKSTATION_USER/.config"
 # 5. AMAZON DCV SERVER (Free on Amazon EC2)
 # ------------------------------------------------------------------------------
 echo "[-] Installing Amazon DCV Server & QUIC UDP components..."
-DCV_KEYRING="/etc/apt/keyrings/nice-dcv.gpg"
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://d1uj6qtbmh3oeq.cloudfront.net/nice-dcv-ubuntu2404.gpg | gpg --dearmor -o "$DCV_KEYRING"
-echo "deb [signed-by=$DCV_KEYRING] https://d1uj6qtbmh3oeq.cloudfront.net/2023.1/ubuntu2404/amd64 stable" > /etc/apt/sources.list.d/nice-dcv.list
+cd /tmp
+wget -q https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY
+gpg --import NICE-GPG-KEY 2>/dev/null || true
+rm -f NICE-GPG-KEY
 
-apt-get update -y
-apt-get install -y nice-dcv-server nice-xdcv
+wget -q https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-ubuntu2404-x86_64.tgz
+tar -xzf nice-dcv-ubuntu2404-x86_64.tgz
+cd nice-dcv-*-ubuntu2404-x86_64
+apt-get install -y ./nice-dcv-server_*.deb ./nice-dcv-web-viewer_*.deb ./nice-xdcv_*.deb
+cd /tmp
+rm -rf /tmp/nice-dcv*
 
 # Assign permissions
-usermod -aG dcv "$WORKSTATION_USER"
+usermod -aG video dcv || true
+usermod -aG dcv "$WORKSTATION_USER" || true
 
 # Configure DCV Server (/etc/dcv/dcv.conf)
 cat << EOF > /etc/dcv/dcv.conf
