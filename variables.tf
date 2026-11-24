@@ -5,13 +5,13 @@ variable "aws_region" {
 }
 
 variable "instance_type" {
-  description = "Workstation instance type. Prioritizes m7i-flex.large for high single-thread responsiveness and memory, with fallbacks to c7i-flex.large or t3.small."
+  description = "Workstation instance type. Prioritizes m7i-flex.large (the maximum compute allowed under the AWS Free/Credit Tier with 2 vCPU and 8GB RAM)."
   type        = string
   default     = "m7i-flex.large"
 
   validation {
     condition     = contains(["m7i-flex.large", "c7i-flex.large", "t3.small"], var.instance_type)
-    error_message = "The instance_type variable must be one of: m7i-flex.large, c7i-flex.large, or t3.small."
+    error_message = "The instance_type variable must be one of the Free Tier eligible types: m7i-flex.large, c7i-flex.large, or t3.small."
   }
 }
 
