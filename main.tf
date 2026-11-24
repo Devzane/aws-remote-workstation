@@ -31,15 +31,15 @@ data "aws_subnets" "default" {
 }
 
 # ------------------------------------------------------------------------------
-# 2. CANONICAL UBUNTU 24.04 LTS (NOBLE NUMBAT) AMI LOOKUP
+# 2. OFFICIAL WINDOWS SERVER 2022 BASE AMI LOOKUP
 # ------------------------------------------------------------------------------
-data "aws_ami" "ubuntu" {
+data "aws_ami" "windows" {
   most_recent = true
-  owners      = ["099720109477"] # Canonical official account ID
+  owners      = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+    values = ["Windows_Server-2022-English-Full-Base-*"]
   }
 
   filter {
@@ -193,10 +193,10 @@ resource "aws_key_pair" "workstation_key" {
 }
 
 # ------------------------------------------------------------------------------
-# 6. EC2 WORKSTATION INSTANCE
+# 6. EC2 WORKSTATION INSTANCE (WINDOWS SERVER 2022)
 # ------------------------------------------------------------------------------
 resource "aws_instance" "workstation" {
-  ami                  = data.aws_ami.ubuntu.id
+  ami                  = data.aws_ami.windows.id
   instance_type        = var.instance_type
   subnet_id            = tolist(data.aws_subnets.default.ids)[0]
   key_name             = aws_key_pair.workstation_key.key_name
@@ -207,9 +207,9 @@ resource "aws_instance" "workstation" {
   # Dynamic ephemeral public IP allocated only when running (avoids Elastic IP idle fees)
   associate_public_ip_address = true
 
-  # Encrypted 30 GB gp3 root block device
+  # Encrypted 50 GB gp3 root block device for Windows OS & tools
   root_block_device {
-    volume_size           = 30
+    volume_size           = 50
     volume_type           = "gp3"
     iops                  = 3000
     throughput            = 125
@@ -220,10 +220,9 @@ resource "aws_instance" "workstation" {
     }
   }
 
-  # Cloud-init bootstrap template
-  user_data = templatefile("${path.module}/scripts/user_data.sh", {
-    workstation_user = var.workstation_user
-    dcv_password     = var.dcv_password
+  # Windows PowerShell bootstrap template
+  user_data = templatefile("${path.module}/scripts/user_data.ps1", {
+    admin_password = var.dcv_password
   })
 
   user_data_replace_on_change = false
@@ -237,6 +236,7 @@ resource "aws_instance" "workstation" {
 
   tags = {
     Name = "Personal-Desktop-Workstation"
+    OS   = "WindowsServer2022"
   }
 }
 
