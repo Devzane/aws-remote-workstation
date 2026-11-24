@@ -160,12 +160,21 @@ resource "aws_security_group" "workstation_sg" {
     cidr_blocks = [var.allowed_ip]
   }
 
-  # Windows Remote Desktop / xrdp (TCP 3389)
+  # Windows Remote Desktop / RDP TCP (Port 3389)
   ingress {
-    description = "Standard RDP fallback for Windows Remote Desktop Connection"
+    description = "Standard RDP TCP for Windows Remote Desktop Connection"
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
+    cidr_blocks = [var.allowed_ip]
+  }
+
+  # Windows Remote Desktop / RDP UDP Acceleration (Port 3389) - Critical for smooth low-latency streaming
+  ingress {
+    description = "Windows RDP UDP Acceleration for low-latency streaming"
+    from_port   = 3389
+    to_port     = 3389
+    protocol    = "udp"
     cidr_blocks = [var.allowed_ip]
   }
 
