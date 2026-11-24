@@ -6,11 +6,11 @@ A production-grade, cost-optimized, and security-hardened Infrastructure-as-Code
 
 ## Architecture Overview
 
-* **Compute:** Ubuntu 24.04 LTS (Canonical Noble Numbat) on `m7i-flex.large` (2 vCPU, 8 GiB RAM, 4th Gen Intel Xeon Scalable). Fallback to `c7i-flex.large` or `t3.small`.
+* **Compute:** Windows Server 2022 Base on `m7i-flex.large` (2 vCPU, 8 GiB RAM, 4th Gen Intel Xeon Scalable). Fallback to `c7i-flex.large` or `t3.small`.
 * **Region:** `eu-west-1` (Ireland) — Lowest latency (~75–95ms) to Nigeria via major Atlantic subsea cables without requiring account opt-in.
-* **Remote Display:** Amazon DCV (formerly NICE DCV). 100% free of licensing fees on EC2, featuring adaptive H.264/H.265 streaming and QUIC (UDP) on port 8443 for 60 FPS responsiveness.
-* **Desktop Environment:** XFCE4 with window compositing disabled to eliminate remote input lag.
-* **Storage:** 30 GB encrypted `gp3` root EBS volume + 4 GB swap file (`vm.swappiness=10`).
+* **Remote Display:** Native Microsoft Remote Desktop Protocol (RDP) on port 3389 (TCP & UDP acceleration). Native Windows-to-Windows integration with seamless DPI scaling, zero letterboxing, clipboard sync, and pixel-perfect mouse responsiveness.
+* **Storage:** 50 GB encrypted `gp3` root EBS volume (3000 IOPS, 125 MB/s).
+* **Pre-installed Software:** Google Chrome, Visual Studio Code, Git, and Chocolatey package manager.
 * **Security:**
   * Least-privilege IAM instance role with AWS Systems Manager (SSM) Session Manager.
   * Security group restricts remote desktop (8443 TCP/UDP) and SSH (22) exclusively to your `/32` IP address.
