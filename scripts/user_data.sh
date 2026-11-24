@@ -63,6 +63,7 @@ ufw default allow outgoing
 ufw allow 22/tcp comment 'SSH'
 ufw allow 8443/tcp comment 'Amazon DCV Web/TCP'
 ufw allow 8443/udp comment 'Amazon DCV QUIC'
+ufw allow 3389/tcp comment 'Windows RDP XRDP'
 ufw --force enable
 
 # Enforce SSH hardening: disable passwords & root login
@@ -163,6 +164,33 @@ systemctl restart dcvserver
 # Automatically create a persistent virtual session for the user
 sleep 3
 dcv create-session --type=virtual --owner="$WORKSTATION_USER" --user="$WORKSTATION_USER" workstation-session || true
+
+# ------------------------------------------------------------------------------
+# 5b. WINDOWS REMOTE DESKTOP (XRDP FALLBACK)
+# ------------------------------------------------------------------------------
+echo "[-] Installing XRDP as rock-solid low-bandwidth fallback..."
+apt-get install -y xrdp xorgxrdp
+adduser xrdp ssl-cert || true
+apt-get remove -y light-locker light-locker-settings || true
+systemctl stop lightdm || true
+systemctl disable lightdm || true
+
+echo "startxfce4" > "/home/$WORKSTATION_USER/.xsession"
+chown "$WORKSTATION_USER:$WORKSTATION_USER" "/home/$WORKSTATION_USER/.xsession"
+
+cat << 'EOFXRDP' > /etc/xrdp/startwm.sh
+#!/bin/sh
+if test -r /etc/profile; then
+    . /etc/profile
+fi
+unset DBUS_SESSION_BUS_ADDRESS
+unset XDG_RUNTIME_DIR
+exec startxfce4
+EOFXRDP
+chmod +x /etc/xrdp/startwm.sh
+
+systemctl enable xrdp
+systemctl restart xrdp
 
 # ------------------------------------------------------------------------------
 # 6. DEVELOPER ENVIRONMENT & PRODUCTIVITY TOOLS
