@@ -16,12 +16,12 @@ variable "instance_type" {
 }
 
 variable "allowed_ip" {
-  description = "Your client workstation public IP address in CIDR /32 format (e.g., '197.210.65.12/32'). Remote desktop and SSH ports are restricted to this single IP."
+  description = "Your client workstation public IP address in CIDR format (e.g., '197.210.65.12/32' or '143.105.113.0/24'). Remote desktop and SSH ports are restricted to this CIDR."
   type        = string
 
   validation {
-    condition     = can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}/32$", var.allowed_ip)) && var.allowed_ip != "0.0.0.0/0"
-    error_message = "The allowed_ip variable must be a valid single IPv4 address in CIDR /32 format (e.g., '203.0.113.15/32') and cannot be 0.0.0.0/0."
+    condition     = can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[1-2][0-9]|3[0-2])$", var.allowed_ip)) && var.allowed_ip != "0.0.0.0/0"
+    error_message = "The allowed_ip variable must be a valid IPv4 CIDR (e.g. '143.105.113.0/24') and cannot be 0.0.0.0/0."
   }
 }
 
