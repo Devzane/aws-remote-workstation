@@ -9,9 +9,16 @@ $ErrorActionPreference = "Continue"
 $adminPassword = "${admin_password}"
 net user Administrator $adminPassword /active:yes
 
-# 2. Configure Remote Desktop (RDP)
+# 2. Configure Remote Desktop (RDP) & Audio Redirection
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0 -Force
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 0 -Force
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "fDisableAudio" -Value 0 -Force
+
+# Enable Windows Audio services (stopped/manual by default on Windows Server)
+Set-Service -Name AudioEndpointBuilder -StartupType Automatic
+Start-Service AudioEndpointBuilder -ErrorAction SilentlyContinue
+Set-Service -Name Audiosrv -StartupType Automatic
+Start-Service Audiosrv -ErrorAction SilentlyContinue
 
 # 3. Configure Windows Firewall for RDP (TCP & UDP)
 Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
